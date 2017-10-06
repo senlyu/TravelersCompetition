@@ -1,8 +1,8 @@
 # TravelersCompetition
 
-# Register Page: pollev.com/surveys/JYIuhZBnq
+### Register Page: pollev.com/surveys/JYIuhZBnq
 
-# TimeLine:
+### TimeLine:
 Oct 5th-----Introduction
 Oct 13th----Deadlien to register
 Oct 16th----Get Data
