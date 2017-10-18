@@ -104,6 +104,12 @@ train6$ni.age=range01(train6$ni.age)
 
 ############split train,validation
 model =train6
+install.packages("caTools")
+library(caTools)
+set.seed(123)
+split_train = sample.split(model,SplitRatio = .8)
+training_set = subset(model,split_train==TRUE)
+validation_set = subset(model,split_train==FALSE)
 
 #####way 2:  model = as.data.frame(scale(model[,-c(18,27)]))
 #model = cbind(model,train6[,27])
@@ -111,10 +117,15 @@ model =train6
 
 ############model part
 formula = as.formula(paste("cancel~",paste(colnames(model)[-c(18,27)],collapse = "+"),sep = ""))
-fit = glm(formula,model,family = binomial())
+fit = glm(formula,training_set,family = binomial())
 summary(fit)
 
+predicted_value = predict(fit,validation_set,type = "response")
 
 
-
-
+##########c-statistic
+install.packages("ROCR")
+library(ROCR)
+pred_input = prediction(predicted_value,validation_set$cancel)
+AUC =performance(pred_input,"auc")
+print(AUC@y.values)
