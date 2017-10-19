@@ -103,6 +103,7 @@ train6$len.at.res=range01(train6$len.at.res)
 train6$ni.age=range01(train6$ni.age)
 
 ############### balanced cross-validation (train, validation and test)
+model = train6
 install.packages("caTools")
 library(caTools)
 
