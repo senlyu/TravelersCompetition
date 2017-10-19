@@ -3,6 +3,7 @@ Done:
 2. missing value的处理
 3. 使用了dummy
 4. 删除了cancel=-1
+5. run LR model get results
 
 
 Decided but not done:
