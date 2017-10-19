@@ -1,8 +1,8 @@
 Done:
-1.数据读取
-2.missing value的处理
-3.使用了dummy
-4.删除了cancel=-1
+1. 数据读取
+2. missing value的处理
+3. 使用了dummy
+4. 删除了cancel=-1
 
 
 Decided but not done:
@@ -12,7 +12,7 @@ Decided but not done:
 
 
 Need to decided:
-1.what is c stat
-2.why c stat is high
-3.
+1. what is c stat
+2. why c stat is high
+3. 
 
