@@ -107,7 +107,7 @@ model =train6
 install.packages("caTools")
 library(caTools)
 set.seed(123)
-split_train = sample.split(model,SplitRatio = .8)
+split_train = sample.split(model$cancel,SplitRatio = .8)
 training_set = subset(model,split_train==TRUE)
 validation_set = subset(model,split_train==FALSE)
 
