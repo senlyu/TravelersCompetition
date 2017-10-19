@@ -102,30 +102,46 @@ train6$premium=range01(train6$premium)
 train6$len.at.res=range01(train6$len.at.res)
 train6$ni.age=range01(train6$ni.age)
 
-############split train,validation
-model =train6
+############### balanced cross-validation (train, validation and test)
 install.packages("caTools")
 library(caTools)
-set.seed(123)
-split_train = sample.split(model$cancel,SplitRatio = .8)
-training_set = subset(model,split_train==TRUE)
-validation_set = subset(model,split_train==FALSE)
 
-#####way 2:  model = as.data.frame(scale(model[,-c(18,27)]))
-#model = cbind(model,train6[,27])
-
-
-############model part
 formula = as.formula(paste("cancel~",paste(colnames(model)[-c(18,27)],collapse = "+"),sep = ""))
-fit = glm(formula,training_set,family = binomial())
-summary(fit)
 
-predicted_value = predict(fit,validation_set,type = "response")
+vector_validation = c()
+vector_testing = c()
+vector_average = c()
+table = matrix(NA,nrow=26,ncol=200)
 
-
-##########c-statistic
-install.packages("ROCR")
-library(ROCR)
-pred_input = prediction(predicted_value,validation_set$cancel)
-AUC =performance(pred_input,"auc")
-print(AUC@y.values)
+for (i in (1:200)) {                            ############ sampling 200 times
+  data_cancel1=model[model$cancel==1,]
+  data_cancel0=model[model$cancel==0,]
+  split_train1=sample.split(data_cancel1$cancel,SplitRatio = .8)
+  training1_set =subset(data_cancel1,split_train1==TRUE)
+  validation1_set = subset(data_cancel1,split_train1==FALSE)
+  split_train0=sample.split(data_cancel0$cancel,SplitRatio = nrow(training1_set)/(nrow(data_cancel0)))
+  training0_set =subset(data_cancel0,split_train0==TRUE)
+  validation0_set =subset(data_cancel0,split_train0==FALSE)
+  training_set=rbind(training0_set,training1_set)
+  validation = rbind(validation0_set,validation1_set)
+  split_validation = sample.split(validation,SplitRatio = 0.5)
+  validation_set = subset(validation,split_validation==TRUE)
+  testing_set =subset(validation,split_validation==FALSE)
+  
+  fit = glm(formula,training_set,family = binomial())      ################ model part
+  
+  predicted_value = predict(fit,validation_set,type = "response")         ############ get AUC
+  pred_input = prediction(predicted_value,validation_set$cancel)
+  AUC_validation =performance(pred_input,"auc")
+  testing_value = predict(fit,testing_set,type = "response")
+  testing_input = prediction(testing_value,testing_set$cancel)
+  AUC_testing =performance(testing_input,"auc")
+  
+  table[,i]=as.vector(fit$coefficients)                                   ########## restore AUC and coefficient
+  vector_validation[i]=unlist(AUC_validation@y.values)
+  vector_testing[i]=unlist(AUC_testing@y.values)
+  vector_average[i]=mean(c(vector_validation[i],vector_testing[i]))
+  
+}
+matrix = as.data.frame(cbind(vector_validation,vector_testing,vector_average))
+table[,which.max(x = matrix$vector_average)]                  ############# best model's coefficient
