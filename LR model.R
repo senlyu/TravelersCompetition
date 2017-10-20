@@ -158,11 +158,12 @@ for (i in (1:500)) {                            ############ sampling n times
 }
 matrix = as.data.frame(cbind(vector_validation,vector_testing,vector_average,vector_aic))    ########## AUC matrix
 rownames(table) = c("intercept",colnames(model)[-c(1,18,24,27)])
-
 write.csv(matrix,"LR AUC Matrix.csv",row.names = F)
+
 best_coef =as.data.frame(table[,which.max(x = matrix$vector_average)])                 ############# best model's coefficient
-write.csv(coef,"LR mean_coef.csv",row.names = F)
+
 coef = as.data.frame(apply(table,MARGIN = 1,FUN = mean))                  ############## mean-coef
+write.csv(coef,"LR mean_coef.csv",row.names = F)
 
 ################### predict response part
 ptest = as.data.frame(t(test))
