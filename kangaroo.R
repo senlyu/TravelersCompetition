@@ -26,7 +26,6 @@ train =train[,c(1:17,19,18)]
 summary(train)
 str(train)
 
-cor(train6, use="complete.obs", method="kendall") 
 ################## Outliers
 par(mfrow=c(2,2))
 for (i in (2:18)) {
