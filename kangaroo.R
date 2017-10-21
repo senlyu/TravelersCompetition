@@ -125,7 +125,7 @@ index = sample(nrow(model),nrow(model)*0.1)
 test = model[index,]                            ########### test set
 tv = model[-index,]
 
-############### balanced cross-validation training and validation
+############### Logistic Regression with balanced cross-validation training and validation
 formula = as.formula(paste("cancel~",paste(colnames(model)[-c(1,18,24,27)],
                                            collapse = "+"),sep = ""))
 
@@ -147,7 +147,7 @@ for (i in (1:500)) {                            ############ sampling n times
   training=rbind(training0_set,training1_set)
   validation = rbind(validation0_set,validation1_set)
 
-  fit = glm(formula,training,family = binomial())      ################ model part
+  fit = glm(formula,training,family = binomial())      ################ GLM model part
   
   pred_value = predict(fit,validation,type = "response")
   pred_input = prediction(pred_value,validation$cancel)
@@ -171,7 +171,7 @@ best_coef =as.data.frame(table[,which.max(x = matrix$vector_average)])          
 write.csv(coef,"LR mean_coef.csv",row.names = F)
 coef = as.data.frame(apply(table,MARGIN = 1,FUN = mean))                  ############## mean-coef
 
-################### predict response part
+################### Logistic Regression predict response part
 ptest = as.data.frame(t(test))
 
 check = cbind(coef[match(rownames(ptest),rownames(coef)),],ptest)   ######## test mean-coef:AUC 0.745
@@ -204,7 +204,7 @@ pred_input = prediction(prob,test$cancel)
 AUC =performance(pred_input,"auc")
 print(AUC@y.values)
 
-colAUC(prob,test$cancel,plotROC = TRUE) ########  plot ROC curve
+colAUC(prob,test$cancel,plotROC = TRUE)                                        ########  plot ROC curve
 
 # plot coef distribution
 par(mfrow=c(2,2))
@@ -218,7 +218,7 @@ install.packages("rpart")
 library(rpart)
 
 model$cancel=as.factor(model$cancel)
-test = model[index,]                            ########### test set
+test = model[index,]                                                          ########### test set
 tv = model[-index,]
 
 fit = rpart(formula,data = tv,method = "class")
@@ -233,32 +233,32 @@ post(fit, file = "c:/tree.ps",
 pred = predict(fit,test,type = "prob")
 p =prediction(pred[,2],test$cancel)
 auc = performance(p,"auc")
-auc@y.values     ########################  AUC:0.5  有问题
+auc@y.values                                                                ########################  AUC:0.5  有问题
 
 
-##############Random Forest
+##############  Random Forest
 install.packages("randomForest")
 library(randomForest)
 model =train6
 model$cancel=as.factor(model$cancel)
-test = model[index,]                            ########### test set
+test = model[index,]                           
 tv = model[-index,]
 
 fit <- randomForest(formula,data=tv,ntree = 500)
 
 print(fit) # view results 
-import = as.data.frame(importance(fit))  # importance of each predictor
+import = as.data.frame(importance(fit))                                         # importance of each predictor
 write.csv(import,"Random Forest Importance.csv",row.names = T)
 pred = predict(fit,test,type = "prob")
 p =prediction(pred[,2],test$cancel)
 auc = performance(p,"auc")
-auc@y.values      ########################  AUC:0.71(ntree = 500)
+auc@y.values                                                                    ########################  AUC:0.71(ntree = 500)
 
-##################### glmnet
+##################### glmnet model
 install.packages("caret")
 library(caret)
 model$cancel=as.factor(model$cancel)
-test = model[index,]                            ########### test set
+test = model[index,]                           
 tv = model[-index,]
 
 objControl = trainControl(method = "cv", number = 50,returnResamp='none')
@@ -270,7 +270,7 @@ objModel = train(x = tv[,-c(1,18,24,27)], tv$cancel, method='glmnet',trControl=o
 pred = predict(objModel,test,type = "prob")
 p =prediction(pred[,2],test$cancel)
 auc = performance(p,"auc")
-auc@y.values                                             ########################  AUC:0.7448
+auc@y.values                                                                   ########################  AUC:0.7448
 summary(objModel)
 
 plot(varImp(objModel,scale=F))
