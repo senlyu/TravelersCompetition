@@ -147,7 +147,7 @@ for (i in (1:500)) {                            ############ sampling n times
   training=rbind(training0_set,training1_set)
   validation = rbind(validation0_set,validation1_set)
 
-  fit = glm(formula,training,family = binomial())      ################ GLM model part
+  fit = glm(formula,training,family = “binomial”)      ################ GLM model part
   
   pred_value = predict(fit,validation,type = "response")
   pred_input = prediction(pred_value,validation$cancel)
