@@ -351,6 +351,13 @@ test.test$zip.code=as.factor(test.test$zip.code)
 
 test.test4 = test.test
 
+             
+getmode <- function(v) {
+  v = v[!is.na(v)]
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+             
 for (i in (2:18)) {
   if(class(test.test4[,i])!='factor') {
     if (sum(is.na(test.test4[,i]))!=0) {
@@ -363,7 +370,7 @@ for (i in (2:18)) {
 for (i in (2:18)) {
   if(class(test.test4[,i])=='factor') {
     if (sum(is.na(test.test4[,i]))!=0) {
-      test.test4=subset(test.test4,!is.na(test.test4[,i]))
+      test.test4[which(is.na(test.test4[,i])),i]=getmode(test.test4[,i])
     }
   } 
   else {next}
@@ -420,6 +427,7 @@ cancel = as.integer(prob > 0.5)
 length(cancel)
 
 test.result = data.frame(test.test6$id, prob, cancel)
+test.result=test.result[,-3]
 
 dim(test.result)
 
