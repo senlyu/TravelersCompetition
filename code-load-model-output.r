@@ -55,7 +55,7 @@ train1 = subset(train,train$n.adults<=6)
 #n.children
 hist(train$n.children)
 #nrow(subset(train,train$n.children<=7))
-train2 = subset(train1,train1$n.adults<=7)
+train2 = subset(train1,train1$n.children<=7)
 
 #len.at.res
 hist(train$len.at.res)
