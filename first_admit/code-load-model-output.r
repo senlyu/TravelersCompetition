@@ -15,7 +15,7 @@ library(randomForest)
 library(caret)
 library(e1071)
 
-setwd('/home/senlyu/git/TravelersCompetition/data')
+setwd('D:/徐文艺/2017 Travelers')
 
 ############### read dataset
 train = read.csv('Train.csv')
@@ -55,7 +55,7 @@ train1 = subset(train,train$n.adults<=6)
 #n.children
 hist(train$n.children)
 #nrow(subset(train,train$n.children<=7))
-train2 = subset(train1,train1$n.adults<=7)
+train2 = subset(train1,train1$n.children<=7)
 
 #len.at.res
 hist(train$len.at.res)
@@ -330,7 +330,10 @@ auc@y.values
 ######## deal with test dataset with LR
 
 ############### read dataset
+setwd('D:/徐文艺/2017 Travelers/2017 travelers case competition')
+summary(train)
 test.test = read.csv('Test.csv')
+summary(test.test)
 test.test$year =as.factor(test.test$year)
 ################## zip code (assign based on first three digits)
 test.test$area = NA
@@ -351,6 +354,18 @@ test.test$zip.code=as.factor(test.test$zip.code)
 
 test.test4 = test.test
 
+             
+getmode <- function(v) {
+  v = v[!is.na(v)]
+  uniqv <- unique(v)
+  uniqv[which.max(tabulate(match(v, uniqv)))]
+}
+
+test.test4$dwelling.type[which(test.test4$dwelling.type=='Landlord')]=getmode(test.test4$dwelling.type)
+summary(test.test4$dwelling.type)
+test.test4$dwelling.type=factor(test.test4$dwelling.type,levels=c("Condo","House","Tenant"))
+length(test.test4$dwelling.type)            
+
 for (i in (2:18)) {
   if(class(test.test4[,i])!='factor') {
     if (sum(is.na(test.test4[,i]))!=0) {
@@ -363,7 +378,7 @@ for (i in (2:18)) {
 for (i in (2:18)) {
   if(class(test.test4[,i])=='factor') {
     if (sum(is.na(test.test4[,i]))!=0) {
-      test.test4=subset(test.test4,!is.na(test.test4[,i]))
+      test.test4[which(is.na(test.test4[,i])),i]=getmode(test.test4[,i])
     }
   } 
   else {next}
@@ -396,7 +411,8 @@ test.test6$ni.age=range02(test.test6$ni.age, max.ni.age, min.ni.age)
 head(test.test6)
 
 head(train6)
-
+colnames(test.test6)
+colnames(model)
 
 
 ################### Logistic Regression predict response part
@@ -420,6 +436,8 @@ cancel = as.integer(prob > 0.5)
 length(cancel)
 
 test.result = data.frame(test.test6$id, prob, cancel)
+test.result=test.result[,-3]
+colnames(test.result)=c("id","pred")
 
 dim(test.result)
 
