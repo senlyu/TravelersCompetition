@@ -1,8 +1,10 @@
 install.packages("caTools")
 install.packages("ROCR")
+install.packages("caret")
 
 library(caTools)
 library(ROCR)
+library(caret)
 
 setwd('D:/徐文艺/2017 Travelers')
 
@@ -149,14 +151,14 @@ tv = model[-index,]
 
 
 ############### Logistic Regression with balanced cross-validation training and validation
-formula = as.formula(paste("cancel~",paste(colnames(model)[-c(1,18,24,27)],
+formula = as.formula(paste("cancel~",paste(colnames(model)[-c(1,4,5,6,7,10,11,12,18,21,24,27)],
                                            collapse = "+"),sep = ""))
 
 vector_train = c()
 vector_validation = c()
 vector_diff = c()
 vector_aic = c()
-table = matrix(NA,nrow=24,ncol=500)
+table = matrix(NA,nrow=16,ncol=500)
 
 for (i in (1:500)) {                            ############ sampling n times
   cancel1=tv[tv$cancel==1,]
@@ -186,7 +188,7 @@ for (i in (1:500)) {                            ############ sampling n times
   vector_diff[i]=vector_train[i]-vector_validation[i]
 }
 matrix = as.data.frame(cbind(vector_train,vector_validation,vector_diff,vector_aic))    ########## AUC matrix
-rownames(table) = c("intercept",colnames(model)[-c(1,18,24,27)])
+rownames(table) = c("intercept",colnames(model)[-c(1,4,5,6,7,10,11,12,18,21,24,27)])
 
 coef = as.data.frame(apply(table,MARGIN = 1,FUN = mean))                  ############## mean-coef
 write.csv(coef,"LR mean_coef.csv",row.names = T)
@@ -195,7 +197,7 @@ write.csv(coef,"LR mean_coef.csv",row.names = T)
 ################### Logistic Regression predict response part
 ptest = as.data.frame(t(test))
 
-check = cbind(coef[match(rownames(ptest),rownames(coef)),],ptest)   ######## test mean-coef:AUC 0.75
+check = cbind(coef[match(rownames(ptest),rownames(coef)),],ptest)   ######## test mean-coef:AUC 0.7536
 intercept = coef[1,1]
 check = rbind(intercept,check)
 rownames(check)[1]="intercept"
@@ -307,7 +309,7 @@ colnames(model)
 ################### Logistic Regression predict response part
 ptest = as.data.frame(t(test.test6))
 
-check = cbind(coef[match(rownames(ptest),rownames(coef)),],ptest)   ######## test mean-coef:AUC 0.745
+check = cbind(coef[match(rownames(ptest),rownames(coef)),],ptest)
 intercept = coef[1,1]
 check = rbind(intercept,check)
 rownames(check)[1]="intercept"
